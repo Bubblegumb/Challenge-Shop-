@@ -1,0 +1,10 @@
+{
+  "name": "nedsshop-backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend scaffold for the NedsShop artwork auction",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}

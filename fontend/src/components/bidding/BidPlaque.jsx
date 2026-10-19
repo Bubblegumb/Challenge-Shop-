@@ -4,7 +4,9 @@ export default function BidPlaque({ artwork }) {
   return (
     <div className="price-plaque">
       <span className="eyebrow">Starting price</span>
-      <p>{formatPrice(artwork.priceCents)} <small>AUD</small></p>
+      {artwork.priceCents == null
+        ? <p className="price-pending">To be confirmed</p>
+        : <p>{formatPrice(artwork.priceCents)} <small>AUD</small></p>}
     </div>
   )
 }

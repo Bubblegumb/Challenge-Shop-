@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { stat } from 'node:fs/promises'
+import { readdir, stat } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { after, before, test } from 'node:test'
@@ -14,6 +14,8 @@ let formatters
 let GalleryWall
 let ArtworkFrame
 let ArtworkInfoDialog
+let BidPlaque
+let App
 
 before(async () => {
   server = await createServer({
@@ -28,12 +30,16 @@ before(async () => {
     server.ssrLoadModule('/src/components/gallery/GalleryWall.jsx'),
     server.ssrLoadModule('/src/components/gallery/ArtworkFrame.jsx'),
     server.ssrLoadModule('/src/components/gallery/ArtworkInfoDialog.jsx'),
+    server.ssrLoadModule('/src/components/bidding/BidPlaque.jsx'),
+    server.ssrLoadModule('/src/App.jsx'),
   ])
   artworkData = modules[0]
   formatters = modules[1]
   GalleryWall = modules[2].default
   ArtworkFrame = modules[3].default
   ArtworkInfoDialog = modules[4].default
+  BidPlaque = modules[5].default
+  App = modules[6].default
 })
 
 after(async () => {
@@ -56,6 +62,42 @@ test('all ten artwork records retain stable IDs, valid cent prices and resolving
     assert.equal(imagePath, `/src/assets/${index + 1}.jpg`)
     assert.ok((await stat(resolve(projectRoot, imagePath.slice(1)))).isFile())
   }))
+})
+
+test('both collections plan ten works and the second includes only supplied images', async () => {
+  const [first, second] = artworkData.collections
+  assert.equal(artworkData.collections.length, 2)
+  assert.equal(first.id, 'first-collection')
+  assert.equal(first.title, 'The first collection')
+  assert.equal(first.artworks, artworkData.artworks)
+  assert.equal(second.id, 'second-collection')
+  assert.equal(second.title, 'The second collection')
+  assert.equal(first.plannedWorkCount, 10)
+  assert.equal(second.plannedWorkCount, 10)
+
+  const photoNumbers = (await readdir(resolve(projectRoot, 'src/assets')))
+    .map(name => /^(\d+)\.jpg$/.exec(name))
+    .filter(Boolean)
+    .map(match => Number(match[1]))
+    .filter(number => number >= 11 && number <= 20)
+    .sort((a, b) => a - b)
+  assert.equal(photoNumbers[0], 11)
+  assert.equal(second.artworks.length, photoNumbers.length)
+
+  for (const [index, artwork] of second.artworks.entries()) {
+    const workNumber = photoNumbers[index] - 10
+    assert.equal(artwork.id, `second-study-${workNumber}`)
+    assert.equal(artwork.number, formatters.formatArtworkNumber(workNumber))
+    assert.equal(artwork.collectionTitle, second.title)
+    assert.ok(artwork.priceCents === null || (Number.isInteger(artwork.priceCents) && artwork.priceCents >= 0))
+    const imagePath = decodeURIComponent(new URL(artwork.imageUrl, 'http://localhost').pathname)
+    assert.equal(imagePath, `/src/assets/${photoNumbers[index]}.jpg`)
+    assert.ok((await stat(resolve(projectRoot, imagePath.slice(1)))).isFile())
+  }
+
+  const allArtworks = artworkData.collections.flatMap(collection => collection.artworks)
+  assert.equal(new Set(allArtworks.map(artwork => artwork.id)).size, allArtworks.length)
+  for (const artwork of first.artworks) assert.equal(artwork.collectionTitle, first.title)
 })
 
 test('the legacy artwork-data formatter export remains the shared formatter', () => {
@@ -85,6 +127,33 @@ test('the initial gallery exposes one accessible slide and correct navigation bo
   assert.doesNotMatch(next, /\bdisabled(?:=|\s|$)/)
 })
 
+test('the exhibition title is a collection switch with an accessible destination', () => {
+  const markup = renderToStaticMarkup(createElement(App))
+  assert.match(markup, /<button\b[^>]*aria-label="The first collection\. Switch to the second collection\."/)
+  assert.match(markup, /<button\b[^>]*aria-controls="gallery"/)
+  assert.match(markup, /10 works/)
+})
+
+test('a one-work second collection has correct labels and disables both navigation buttons', () => {
+  const second = artworkData.collections[1]
+  const collection = { ...second, artworks: second.artworks.slice(0, 1) }
+  const markup = renderToStaticMarkup(createElement(GalleryWall, { collection }))
+  const slides = [...markup.matchAll(/<div\b(?=[^>]*\bclass="artwork-slide")([^>]*)>/g)]
+  assert.equal(slides.length, 1)
+  assert.match(slides[0][1], /\baria-hidden="false"/)
+  assert.doesNotMatch(slides[0][1], /\binert(?:=|\s|$)/)
+  assert.match(markup, /\baria-label="Artwork 1 of 1"/)
+  assert.ok(markup.includes(`${second.title} / ${collection.artworks[0].number}`))
+  assert.doesNotMatch(markup, /The first collection/)
+
+  const buttons = [...markup.matchAll(/<button\b([^>]*)>/g)].map(match => match[1])
+  for (const label of ['Previous artwork', 'Next artwork']) {
+    const attributes = buttons.find(attributes => attributes.includes(`aria-label="${label}"`))
+    assert.ok(attributes)
+    assert.match(attributes, /\bdisabled(?:=|\s|$)/)
+  }
+})
+
 test('the information button passes its own artwork to the selection callback', () => {
   const artwork = artworkData.artworks[4]
   let selected
@@ -97,7 +166,7 @@ test('the information button passes its own artwork to the selection callback', 
   assert.equal(selected, artwork)
 })
 
-test('selected artwork information retains the description, six guide facts and preview notice', () => {
+test('selected artwork information retains the description and six guide facts', () => {
   const artwork = {
     ...artworkData.artworks[0],
     description: 'A study of light in a quiet room.',
@@ -117,10 +186,19 @@ test('selected artwork information retains the description, six guide facts and 
   assert.equal(facts.Framing, artwork.frame)
   assert.equal(facts['Collection &amp; postage'], 'Collection area to be confirmed; optional postage by quote.')
   assert.ok(markup.includes(artwork.description))
-  assert.ok(markup.includes('purchases and bids are not open.'))
   assert.match(markup, /\baria-labelledby="dialog-title"/)
   assert.match(markup, /\baria-describedby="dialog-description"/)
   assert.match(markup, /\baria-label="Close artwork information"/)
+})
+
+test('unconfirmed starting prices remain unconfirmed in the plaque and second-collection dialog', () => {
+  const artwork = { ...artworkData.collections[1].artworks[0], priceCents: null }
+  const plaque = renderToStaticMarkup(createElement(BidPlaque, { artwork }))
+  const dialog = renderToStaticMarkup(createElement(ArtworkInfoDialog, { artwork, onClose() {} }))
+  assert.ok(plaque.includes('To be confirmed'))
+  assert.match(dialog, /<dt>Starting price<\/dt><dd>To be confirmed<\/dd>/)
+  assert.ok(dialog.includes(`${artwork.collectionTitle} / ${artwork.number}`))
+  assert.doesNotMatch(plaque + dialog, /\$0|\$NaN/)
 })
 
 test('an unselected information dialog has no stale artwork details', () => {

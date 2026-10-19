@@ -23,7 +23,7 @@ export default function ArtworkInfoDialog({ artwork, onClose }) {
     ['Medium', artwork.medium],
     ['Dimensions', artwork.dimensions],
     ['Condition', artwork.condition],
-    ['Starting price', `${formatPrice(artwork.priceCents)} AUD`],
+    ['Starting price', artwork.priceCents == null ? 'To be confirmed' : `${formatPrice(artwork.priceCents)} AUD`],
     ['Framing', artwork.frame, 'fact-long'],
     ['Collection & postage', 'Collection area to be confirmed; optional postage by quote.', 'fact-long'],
   ] : []
@@ -46,7 +46,7 @@ export default function ArtworkInfoDialog({ artwork, onClose }) {
         <div className="dialog-content">
           <div className="dialog-heading">
             <div className="dialog-title-group">
-              <p className="eyebrow">Collection notes / {artwork.number}</p>
+              <p className="eyebrow">{artwork.collectionTitle} / {artwork.number}</p>
               <h2 id="dialog-title">{artwork.title}</h2>
             </div>
             <button
@@ -72,11 +72,6 @@ export default function ArtworkInfoDialog({ artwork, onClose }) {
               ))}
             </dl>
           </section>
-
-          <p className="dialog-note">
-            Preview only. Artwork details and reference credits are being prepared;
-            purchases and bids are not open.
-          </p>
         </div>
       )}
     </dialog>

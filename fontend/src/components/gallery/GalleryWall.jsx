@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { artworks } from '../../data/artworks'
+import { collections } from '../../data/artworks'
 import { formatArtworkNumber } from '../../utils/formatters'
 import { clampSlideIndex, createGalleryWheelHandler } from '../../utils/galleryNavigation'
 import { animateGalleryScroll } from '../../utils/animateGalleryScroll'
 import ArtworkDisplay from './ArtworkDisplay'
 import ArtworkInfoDialog from './ArtworkInfoDialog'
 
-export default function GalleryWall() {
+export default function GalleryWall({ collection = collections[0] }) {
+  const { artworks } = collection
   const wall = useRef(null)
   const activeSlide = useRef(0)
   const scrollAnimation = useRef(null)
@@ -44,7 +45,7 @@ export default function GalleryWall() {
     }
 
     scrollAnimation.current = animateGalleryScroll(element, left)
-  }, [stopAnimation])
+  }, [artworks.length, stopAnimation])
 
   useEffect(() => {
     const element = wall.current
@@ -63,7 +64,7 @@ export default function GalleryWall() {
     // A non-passive listener can consume vertical scrolling inside the gallery.
     element.addEventListener('wheel', handleWheel, { passive: false })
     return () => element.removeEventListener('wheel', handleWheel)
-  }, [goTo, stopAnimation])
+  }, [artworks.length, goTo, stopAnimation])
 
   function handleKeyDown(event) {
     if (event.target !== event.currentTarget) return
@@ -90,14 +91,14 @@ export default function GalleryWall() {
   }
 
   return (
-    <section id="gallery" className="gallery" aria-label="Artwork gallery">
+    <section id="gallery" className="gallery" aria-label={`${collection.title} artwork gallery`}>
       <div
         ref={wall}
         className="gallery-wall"
         tabIndex={0}
         role="group"
         aria-roledescription="carousel"
-        aria-label="Artwork collection. Scroll, swipe, or use left and right arrow keys to browse."
+        aria-label={`${collection.title}. Scroll, swipe, or use left and right arrow keys to browse.`}
         onKeyDown={handleKeyDown}
         onScroll={updatePosition}
         onPointerDown={stopAnimation}
@@ -109,7 +110,7 @@ export default function GalleryWall() {
         ))}
       </div>
       <div className="gallery-controls">
-        <p className="browse-hint">Scroll, swipe or use the arrows to explore</p>
+        <p className="browse-hint">{artworks.length > 1 ? 'Scroll, swipe or use the arrows to explore' : 'More works coming soon'}</p>
         <div className="paging">
           <span aria-live="polite" aria-atomic="true" aria-label={`Artwork ${active + 1} of ${artworks.length}`}>
             {formatArtworkNumber(active + 1)} <span className="muted">/ {formatArtworkNumber(artworks.length)}</span>

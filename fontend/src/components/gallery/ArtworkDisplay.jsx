@@ -9,7 +9,7 @@ export default function ArtworkDisplay({ artwork, onInfo }) {
       </div>
       <div className="artwork-sidebar">
         <div className="artwork-summary">
-          <p className="work-number">The first collection / {artwork.number}</p>
+          <p className="work-number">{artwork.collectionTitle} / {artwork.number}</p>
           <h2 id={`title-${artwork.id}`}>{artwork.title}</h2>
         </div>
         <BidPlaque artwork={artwork} />

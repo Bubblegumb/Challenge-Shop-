@@ -1,8 +1,10 @@
 # NedsShop application structure
 
 NedsShop currently runs as a React and Vite gallery in `fontend/` (the existing
-directory spelling is retained). It displays ten artwork studies, starting
-prices in AUD and a modal information guide. Login, bid submission, payments
+directory spelling is retained). Its exhibition title switches between two
+collections of ten planned works: the first has all ten images and the second
+currently previews one. It displays sample starting prices in AUD for the first series and
+a modal information guide. Login, bid submission, payments
 and backend requests are planned; they are not implemented.
 
 See the [frontend guide](fontend/README.md) for current behavior and collection

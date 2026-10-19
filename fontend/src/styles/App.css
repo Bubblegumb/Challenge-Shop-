@@ -83,6 +83,35 @@ main {
   letter-spacing: -.5px;
 }
 
+.collection-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+
+.collection-switch svg {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: 1px solid var(--wall-line);
+  border-radius: 50%;
+  color: var(--brass);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.collection-switch:hover svg {
+  border-color: var(--brass);
+  background: #ffffff12;
+}
+
 .exhibition-note > span {
   color: var(--wall-muted);
   font-size: 11px;
@@ -292,6 +321,10 @@ main {
   letter-spacing: .6px;
   margin-left: 3px;
   color: var(--muted);
+}
+
+.price-plaque .price-pending {
+  font-size: 17px;
 }
 
 .info-button {
@@ -523,15 +556,6 @@ footer p {
   overflow-wrap: anywhere;
 }
 
-.dialog-note {
-  background: #e8e1d1;
-  border-left: 2px solid #9d875e;
-  padding: 8px 10px;
-  color: #635949;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 @media (max-width: 900px) {
   .site-header {
     min-height: 62px;
@@ -757,6 +781,7 @@ footer p {
   .exhibition-note {
     min-height: 75px;
     display: block;
+    padding-block: 6px 10px;
   }
 
   .exhibition-note h1 {
@@ -890,7 +915,7 @@ footer p {
     transform: none;
   }
 
-  .info-button > span, .paging button {
+  .info-button > span, .paging button, .collection-switch svg {
     transition: none;
   }
 }

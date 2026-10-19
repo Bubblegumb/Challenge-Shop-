@@ -1,41 +1,53 @@
 # NedsShop application structure
 
-Follow [the learning guide](WEBSITE_LEARNING_GUIDE.md) and [feature roadmap](FEATURE_ROADMAP.md).
+NedsShop currently runs as a React and Vite gallery in `fontend/` (the existing
+directory spelling is retained). It displays ten artwork studies, starting
+prices in AUD and a modal information guide. Login, bid submission, payments
+and backend requests are planned; they are not implemented.
+
+See the [frontend guide](fontend/README.md) for current behavior and collection
+editing, and the [backend plan](backend/README.md) for future server work.
+The local [learning guide](WEBSITE_LEARNING_GUIDE.md),
+[feature roadmap](FEATURE_ROADMAP.md) and
+[feature completion guide](FEATURE_COMPLETION_GUIDE.md) describe future work.
 
 ```text
 NedsShop/
-|-- fontend/                       React + Vite (existing spelling retained)
-|   |-- public/                    Files served unchanged, including artwork photos
+|-- fontend/                       React + Vite gallery
+|   |-- public/                    Files served unchanged at public URLs
 |   |-- src/
 |   |   |-- main.jsx               React entry point
-|   |   |-- App.jsx                Compose the application
-|   |   |-- assets/                Images imported by components
+|   |   |-- App.jsx                Header, exhibition note, gallery and footer
+|   |   |-- assets/                Numbered artwork JPGs imported by Vite
 |   |   |-- components/
-|   |   |   |-- layout/            NavigationBar and shared layout
-|   |   |   |-- auth/              Login and account controls
-|   |   |   |-- fundraising/       FundraisingNotice and disclosures
 |   |   |   |-- gallery/           GalleryWall, ArtworkDisplay, ArtworkFrame,
-|   |   |   |                      ArtworkInfoButton, ArtworkInfoDialog
-|   |   |   |-- bidding/           BidPlaque, BidForm and bid confirmation
-|   |   |-- pages/                 Future Home, Artwork, MyBids, FAQ, Admin screens
-|   |   |-- hooks/                 Reusable React state/effects when needed
-|   |   |-- data/                  Public practice artwork data
-|   |   |-- services/              Browser requests to the future backend
-|   |   |-- utils/                 Shared money/date formatting
+|   |   |   |                      ArtworkInfoDialog
+|   |   |   |-- bidding/           Starting-price display: BidPlaque
+|   |   |-- data/                  Public practice artwork records
+|   |   |-- hooks/                 Reserved for reusable state/effects
+|   |   |-- pages/                 Reserved for future screens
+|   |   |-- services/              Reserved for future backend requests
+|   |   |-- utils/                 Shared formatting and carousel bounds
 |   |   |-- styles/                App.css and global index.css
+|   |-- tests/                     Utility and rendered-gallery regression tests
 |   |-- package.json
 |   |-- package-lock.json
 |   |-- vite.config.js
-|-- backend/                       Reserved for future server code
-|-- database/
-|   |-- migrations/                Future schema changes and access policies
-|-- WEBSITE_LEARNING_GUIDE.md
-|-- FEATURE_ROADMAP.md
+|-- backend/                       Future server package; no runtime yet
+|   |-- database/
+|   |   |-- README.md              Database implementation guidance
+|   |   |-- migrations/            Reserved for schema and access policies
+|   |-- tests/                     Reserved for future backend tests
+|   |-- README.md                  Planned server responsibilities
+|   |-- package.json               No dependencies or run scripts yet
+|   |-- package-lock.json
+|-- decisions/                     Implementation decisions and references
 ```
 
-This is a folder scaffold. The Vite starter remains the current screen. Login and
-NavigationBar are still empty files; other named components above are planned,
-not implemented. `.gitkeep` files preserve empty directories in version control.
+Empty frontend directories use `.gitkeep` files until they contain real code.
+Unimplemented component files and comment-only backend files have been removed;
+their planned responsibilities remain documented instead of appearing as
+working modules.
 
 ## Run locally
 
@@ -47,29 +59,30 @@ npm ci
 npm run dev
 ```
 
-Run `npm run lint` and `npm run build` from `fontend` to check changes.
+No backend or environment variables are required for the current gallery.
+Run `npm test`, `npm run lint` and `npm run build` from `fontend` to check changes.
 Use `npm run preview` to inspect the production build.
 
 ## Where to add code
 
-- Compose the first screen in `App.jsx`. Use `pages` when separate screens are
-  needed; routing has not been installed.
-- Keep feature components together, following the names in section 3 of the
-  learning guide. For example, put `GalleryWall.jsx` and `ArtworkDisplay.jsx` in
-  `components/gallery`. The roadmap's suggested `components/ArtworkCard.jsx`
-  can instead live in `components/gallery/ArtworkCard.jsx`.
-- Keep component-specific CSS beside its component and global rules in `styles`.
-- Put your own public practice image at `fontend/public/artwork-01.jpg`, as the
-  guide suggests. Imported images belong in `src/assets`; both are publicly
-  accessible after deployment.
-- Store public demo listings in `data` and demo bids in React state. Shared
-  formatting helpers belong in `utils`. Add hooks only when state logic needs
-  to be reused.
-- Put browser API requests in `services` once the backend exists. The server must
-  decide real identity, bid acceptance, deadlines, winners and payment amounts.
+- Compose the current screen in `src/App.jsx`. Add separate screens to `pages`
+  when needed; routing has not been installed.
+- Keep gallery components in `components/gallery` and bidding components in
+  `components/bidding`. Add authentication and other feature folders when
+  implementation begins.
+- Keep gallery presentation and global rules in `src/styles`.
+- Store imported artwork images in `src/assets` and public demo listings in
+  `src/data`. Files in `public` are served unchanged. Both image locations are
+  publicly accessible after deployment.
+- Put shared formatting helpers in `utils`, reusable state/effects in `hooks`
+  and future browser API requests in `services` as concrete needs arise.
+- Implement server responsibilities described in `backend/README.md` before
+  accepting real bids. The server must decide identity, bid acceptance,
+  deadlines, winners and payment amounts.
 - Keep secrets, buyer records and private permission evidence out of frontend
-  source and public assets. Database policies belong with migrations.
+  source and public assets. Database changes and policies belong in
+  `backend/database/migrations`.
 
-The guide's `src/App.css` and `src/index.css` now live in `src/styles/`; imports
-have been updated. Continue using the guide's `fontend` working directory and
-`src/App.jsx` exercises. No dependencies or live services have been added.
+The learning guide's `src/App.css` and `src/index.css` live in `src/styles/`.
+Continue using the guide's `fontend` working directory and `src/App.jsx`
+exercises, treating planned features as implementation guidance.

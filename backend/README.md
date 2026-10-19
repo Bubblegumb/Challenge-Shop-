@@ -1,39 +1,48 @@
-﻿# NedsShop backend scaffold
+# NedsShop backend plan
 
-The JavaScript files contain TODO comments only. No dependencies are installed,
-and no server, routes, authentication or payments are implemented. There are no
-run scripts yet.
+This package reserves space for a future artwork-auction backend. No server,
+routes, authentication, payments, database migrations or tests are implemented.
+The package has no dependencies or run scripts. The current frontend gallery
+runs independently of this package.
+
+Comment-only source placeholders have been removed. Add executable modules and
+their tests when implementing the responsibilities below.
 
 ```text
 backend/
-|-- src/
-|   |-- app.js                    Express application setup
-|   |-- server.js                 HTTP server startup
-|   |-- config/env.js             Environment configuration and validation
-|   |-- middleware/               Session, admin and error handling
-|   |-- modules/
-|   |   |-- artworks/
-|   |   |-- auth/
-|   |   |-- bids/
-|   |   |-- orders/
-|   |-- jobs/finaliseAuctions.js  Scheduled auction finalisation
-|   |-- lib/database.js           Server-only database client
-|-- tests/                        Future backend tests
-|-- .env                          Local configuration; ignored by Git
+|-- database/
+|   |-- README.md                 Database implementation guidance
+|   |-- migrations/               Reserved for ordered schema changes
+|-- tests/                        Reserved for future backend tests
 |-- .env.example                  Safe configuration template
-|-- .gitignore
-|-- package.json
+|-- .gitignore                    Includes local .env files
+|-- package.json                  Future server package metadata
+|-- package-lock.json             Dependency-free npm lockfile
 ```
 
-Each feature folder contains routes, controller and service files. Routes map
-URLs to handlers; controllers handle HTTP input/output; services contain server
-operations. Implement and test these as each feature is built. Installing
- dependencies later will generate package-lock.json.
+## Planned responsibilities
+
+Start with application setup, HTTP startup, configuration validation and a
+health endpoint. Install the selected server framework and add run scripts
+when there is executable server code.
+
+Organize feature modules around artworks, authentication, bids and orders.
+Routes should map URLs to handlers; controllers should validate HTTP input and
+shape responses; services should own server operations and database access.
+Create these files as each feature is implemented and tested.
+
+Shared middleware should verify sessions, derive authenticated identity,
+require a server-controlled admin role and return consistent errors without
+exposing private data. A server-only database client should centralize database
+connections. Auction finalisation should run transactionally and create at most
+one order per artwork.
+
+Real bid checks and updates must run atomically in a database transaction.
+Keep secrets on the server, outside frontend code and `VITE_` variables.
+Database schema changes, constraints, indexes and access policies belong in
+`backend/database/migrations` from the repository root, or `database/migrations`
+from this directory.
 
 Follow sections 6-9 of [the learning guide](../WEBSITE_LEARNING_GUIDE.md).
-Database schema changes and access policies belong in ../database/migrations.
-Real bid checks and updates must run atomically in a database transaction.
-Keep secrets on the server, outside frontend code and VITE_ variables.
-
-Start implementation with app.js, server.js and a health endpoint. Then add
-public listings, database access, verified sessions, bidding and orders in stages.
+After the initial server setup, add public listings, database access, verified
+sessions, bidding and orders in stages, with tests for each implemented feature.

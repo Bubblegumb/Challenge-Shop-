@@ -1,33 +1,69 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { artworks } from '../../data/artworks'
 import { formatArtworkNumber } from '../../utils/formatters'
-import { clampSlideIndex } from '../../utils/galleryNavigation'
+import { clampSlideIndex, createGalleryWheelHandler } from '../../utils/galleryNavigation'
+import { animateGalleryScroll } from '../../utils/animateGalleryScroll'
 import ArtworkDisplay from './ArtworkDisplay'
 import ArtworkInfoDialog from './ArtworkInfoDialog'
 
 export default function GalleryWall() {
   const wall = useRef(null)
   const activeSlide = useRef(0)
+  const scrollAnimation = useRef(null)
   const [selected, setSelected] = useState(null)
   const [active, setActive] = useState(0)
+
+  const stopAnimation = useCallback(() => {
+    scrollAnimation.current?.()
+    scrollAnimation.current = null
+  }, [])
 
   // Keep the current slide aligned when rotating a phone or resizing a laptop.
   useEffect(() => {
     const element = wall.current
     const observer = new ResizeObserver(() => {
+      stopAnimation()
       element.scrollTo({ left: activeSlide.current * element.clientWidth, behavior: 'instant' })
     })
     observer.observe(element)
-    return () => observer.disconnect()
-  }, [])
+    return () => {
+      observer.disconnect()
+      stopAnimation()
+    }
+  }, [stopAnimation])
 
-  function goTo(index) {
+  const goTo = useCallback(index => {
     const target = clampSlideIndex(index, artworks.length)
-    wall.current.scrollTo({
-      left: target * wall.current.clientWidth,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    const element = wall.current
+    const left = target * element.clientWidth
+    stopAnimation()
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      element.scrollTo({ left, behavior: 'instant' })
+      return
+    }
+
+    scrollAnimation.current = animateGalleryScroll(element, left)
+  }, [stopAnimation])
+
+  useEffect(() => {
+    const element = wall.current
+    const navigateWithWheel = createGalleryWheelHandler({
+      slideCount: artworks.length,
+      getActiveIndex: () => activeSlide.current,
+      onNavigate: goTo,
     })
-  }
+
+    function handleWheel(event) {
+      const horizontal = event.deltaX !== 0 && Math.abs(event.deltaX) >= Math.abs(event.deltaY)
+      if (event.ctrlKey || horizontal) stopAnimation()
+      navigateWithWheel(event)
+    }
+
+    // A non-passive listener can consume vertical scrolling inside the gallery.
+    element.addEventListener('wheel', handleWheel, { passive: false })
+    return () => element.removeEventListener('wheel', handleWheel)
+  }, [goTo, stopAnimation])
 
   function handleKeyDown(event) {
     if (event.target !== event.currentTarget) return
@@ -61,9 +97,10 @@ export default function GalleryWall() {
         tabIndex={0}
         role="group"
         aria-roledescription="carousel"
-        aria-label="Artwork collection. Scroll horizontally or use left and right arrow keys to browse."
+        aria-label="Artwork collection. Scroll, swipe, or use left and right arrow keys to browse."
         onKeyDown={handleKeyDown}
         onScroll={updatePosition}
+        onPointerDown={stopAnimation}
       >
         {artworks.map((artwork, index) => (
           <div className="artwork-slide" key={artwork.id} inert={index !== active} aria-hidden={index !== active}>
@@ -72,7 +109,7 @@ export default function GalleryWall() {
         ))}
       </div>
       <div className="gallery-controls">
-        <p className="browse-hint">Swipe or use the arrows to explore</p>
+        <p className="browse-hint">Scroll, swipe or use the arrows to explore</p>
         <div className="paging">
           <span aria-live="polite" aria-atomic="true" aria-label={`Artwork ${active + 1} of ${artworks.length}`}>
             {formatArtworkNumber(active + 1)} <span className="muted">/ {formatArtworkNumber(artworks.length)}</span>

@@ -37,6 +37,12 @@ Run these commands from `fontend`:
 
 - Full-width horizontal scroll-snap exhibits, previous/next buttons and touch
   swiping. Resizing keeps the current slide aligned.
+- Mouse-wheel scrolling moves one painting per gesture, with an 800ms pause
+  between advances for a slower browsing pace. Horizontal trackpad
+  scrolling and touch swiping remain native; zoom gestures and information-dialog
+  scrolling are unaffected.
+- Wheel, arrow-button and keyboard transitions ease over 800ms. Direct gestures
+  interrupt the animation; reduced-motion navigation remains instant.
 - Keyboard navigation when the gallery itself has focus: Left/Right to move,
   Home for the first work and End for the last.
 - A vintage gallery palette: dark olive plaster (`#383d34`), walnut frames,
@@ -79,6 +85,7 @@ The starting-price plaque is a display component, not a bidding form.
 | `src/data/artworks.js` | Artwork records, image mapping and legacy formatter re-export. |
 | `src/utils/formatters.js` | Shared AUD price and artwork-number formatting. |
 | `src/utils/galleryNavigation.js` | Shared bounds for requested and scrolled slide indices. |
+| `src/utils/animateGalleryScroll.js` | Cancelable 800ms painting transitions with gentle easing. |
 | `src/assets/` | Numbered artwork JPGs imported by Vite. |
 | `src/styles/` | Global styles and gallery presentation. |
 | `tests/` | Node tests for utilities, artwork contracts and rendered gallery behavior. |

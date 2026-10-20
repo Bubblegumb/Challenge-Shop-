@@ -134,8 +134,9 @@ const collectionDefinitions = [
       {
         id: 'second-study-2',
         image: '12.jpg',
-        title: 'Study No. 02',
-        priceCents: null,
+        title: 'Identity',
+        description:'"Imagine losing track of who you are, who you could have been, and what you could have become. I wanted the sketch to show that feeling of being lost and not recognizing yourself. "',
+        priceCents: 3000,
       },
       {
         id: 'second-study-3',

@@ -141,19 +141,22 @@ const collectionDefinitions = [
       {
         id: 'second-study-3',
         image: '13.jpg',
-        title: 'Study No. 03',
+        title: 'Hope',
+        description: 'Hope is not a happy ending, but a direction. Keep working, keep walking, and slowly, something like resolution begins to appear.',
         priceCents: null,
       },
       {
         id: 'second-study-4',
         image: '14.jpg',
-        title: 'Study No. 04',
+        title: 'The Door',
+        description: 'A door is a small part of a home, but access to belonging changes everything. Not having it can change a persons entire world.',
         priceCents: null,
       },
       {
         id: 'second-study-5',
         image: '15.jpg',
-        title: 'Study No. 05',
+        title: 'A Window',
+        description: 'A window is what we look through when we are not there yet: warm light, people inside, and the feeling that someone is safe.',
         priceCents: null,
       },
       {

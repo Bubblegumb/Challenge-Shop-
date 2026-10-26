@@ -93,6 +93,21 @@ Verify the actual donation before handing over an artwork.
 
 ## 5. Configure the winner email worker
 
+### Owner password recovery
+
+The owner sign-in links to `/#recovery`. In hosted Supabase Authentication email
+templates, replace the **Reset password** template with
+[templates/password-recovery.html](templates/password-recovery.html). Keep
+`{{ .Token }}` so the email includes a recovery code rather than a reset link.
+Custom Auth SMTP must be configured as described above. This code flow does not
+require a redirect URL or database migration.
+
+After deploying the frontend, open `/#recovery`, request a code for the existing
+owner email, and enter the emailed code and a new password of at least 12
+characters. Sign in again at `/#owner`. The user UUID and owner allowlist stay
+the same. Test actual email delivery and recovery in the hosted project; local
+automated checks cannot verify SMTP delivery.
+
 Winner emails still send at the auction deadline, including for artworks
 locked at $75 earlier. They use the existing Gmail SMTP worker.
 

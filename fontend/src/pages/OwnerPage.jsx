@@ -49,6 +49,7 @@ export default function OwnerPage() {
         <label>Email<input name="email" type="email" autoComplete="username" required disabled={pending} /></label>
         <label>Password<input name="password" type="password" autoComplete="current-password" required disabled={pending} /></label>
         <button className="auction-button" disabled={pending || !auctionConfigured}>{pending ? 'Signing in…' : 'Sign in'}</button>
+        <a href="#recovery">Forgot your password?</a>
       </form> : <>
         <div className="owner-controls">
           <button className="auction-button" disabled={pending} onClick={() => run(async () => setResults(await getOwnerResults(session)))}>Refresh</button>

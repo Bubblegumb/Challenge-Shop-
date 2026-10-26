@@ -3,12 +3,12 @@ const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 export const auctionConfigured = Boolean(projectUrl && publishableKey)
 
-export async function supabaseRequest(path, body, token, signal) {
+export async function supabaseRequest(path, body, token, signal, method = 'POST') {
   if (!auctionConfigured) throw new Error('Bidding is being prepared. Please check back soon.')
   let response
   try {
     response = await fetch(`${projectUrl}${path}`, {
-      method: 'POST',
+      method,
       headers: {
         apikey: publishableKey,
         'Content-Type': 'application/json',
@@ -40,6 +40,8 @@ export async function supabaseRequest(path, body, token, signal) {
       response.status === 429 ? 'Please wait a moment before requesting another code.' :
       path === '/auth/v1/verify' ? 'That code is invalid or expired. Check the code or request a new one.' :
       path === '/auth/v1/otp' ? 'Could not send a verification code. Please try again shortly.' :
+      path === '/auth/v1/recover' ? 'Could not send a recovery code. Please try again shortly.' :
+      path === '/auth/v1/user' ? 'Could not update the password. Check the password requirements or request a new recovery code.' :
       path.startsWith('/auth/') ? 'Sign-in failed. Check your email and password.' :
       response.status === 401 ? messages.EMAIL_NOT_VERIFIED :
         'The auction is temporarily unavailable. Please try again.'
@@ -79,6 +81,22 @@ export async function placeBid(bid, accessToken) {
 
 export function ownerSignIn(email, password) {
   return supabaseRequest('/auth/v1/token?grant_type=password', { email, password })
+}
+
+export function requestPasswordRecovery(email) {
+  return supabaseRequest('/auth/v1/recover', { email: email.trim().toLowerCase() })
+}
+
+export async function verifyRecoveryCode(email, code) {
+  const result = await supabaseRequest('/auth/v1/verify', {
+    email: email.trim().toLowerCase(), token: code.trim(), type: 'recovery',
+  })
+  if (!result?.access_token) throw new Error('Recovery could not be verified. Request a new code.')
+  return result.access_token
+}
+
+export function updateRecoveredPassword(password, token) {
+  return supabaseRequest('/auth/v1/user', { password }, token, undefined, 'PUT')
 }
 
 export function getOwnerResults(token) {

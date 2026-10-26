@@ -4,18 +4,20 @@ import { collections } from './data/artworks'
 import useAuction from './hooks/useAuction'
 import BidDialog from './components/bidding/BidDialog'
 import OwnerPage from './pages/OwnerPage'
+import RecoveryPage from './pages/RecoveryPage'
 import { auctionConfigured, getAuction } from './services/auction'
 import { AUCTION_CLOSES_AT, biddingClosed } from './utils/bidding'
 import './styles/App.css'
 
 export default function App() {
-  const [ownerPage, setOwnerPage] = useState(() => typeof window !== 'undefined' && window.location.hash === '#owner')
+  const [page, setPage] = useState(() => typeof window !== 'undefined' ? window.location.hash : '')
   useEffect(() => {
-    const update = () => setOwnerPage(window.location.hash === '#owner')
+    const update = () => setPage(window.location.hash)
     window.addEventListener('hashchange', update)
     return () => window.removeEventListener('hashchange', update)
   }, [])
-  return ownerPage ? <OwnerPage /> : <AuctionGallery />
+  if (page === '#recovery') return <RecoveryPage />
+  return page === '#owner' ? <OwnerPage /> : <AuctionGallery />
 }
 
 function AuctionGallery() {

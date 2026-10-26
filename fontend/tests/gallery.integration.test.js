@@ -22,7 +22,7 @@ let App
 before(async () => {
   server = await createServer({
     root: projectRoot,
-    server: { middlewareMode: true, hmr: false, watch: null },
+    server: { middlewareMode: true, hmr: false, ws: false, watch: null },
     appType: 'custom',
   })
 
@@ -236,10 +236,26 @@ test('guest bidding collects only amount and contact details with clear payment 
     .map(match => match[1]).filter(name => name !== 'website')
   assert.deepEqual(visibleInputNames, ['amount', 'name', 'email'])
   assert.match(markup, /Minimum bid: \$15\.52 AUD/)
+  assert.match(markup, /Maximum: \$75\.00 AUD/)
+  assert.match(markup, /Send verification code/)
+  assert.match(markup, /first verified \$75 bid secures this artwork/)
   assert.match(markup, /Unframed artwork\. No frame is included/)
   assert.match(markup, /State Library during a one-hour window/)
   assert.match(markup, /donate your exact winning bid/)
   assert.doesNotMatch(markup, /name="password"|name="phone"/)
+})
+
+test('a secured artwork disables bidding before the auction deadline', () => {
+  const artwork = artworkData.artworks[0]
+  const lot = { highest_amount_cents: 7500, locked: true }
+  const plaque = renderToStaticMarkup(createElement(BidPlaque, { artwork, lot, canBid: true, onBid() {} }))
+  assert.match(plaque, /Secured at \$75/)
+  assert.match(plaque, /Artwork secured/)
+  assert.match(plaque, /<button[^>]*disabled/)
+  const dialog = renderToStaticMarkup(createElement(BidDialog, { artwork, lot, onClose() {}, onAccepted() {} }))
+  assert.match(dialog, /This artwork is secured at \$75\.00 AUD/)
+  assert.match(dialog, /<button type="submit"[^>]*disabled/)
+  assert.doesNotMatch(dialog, /Minimum bid: \$75\.01/)
 })
 
 test('owner page exposes no bidder contacts before owner authentication', () => {

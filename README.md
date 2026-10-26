@@ -1,21 +1,21 @@
 # NedsShop application structure
 
-NedsShop is a React/Vite gallery in `fontend/` with guest artwork bidding
-backed by Supabase. Every artwork starts at AUD $10. Bids close at noon on
-28 October 2026, Sydney time. Higher bids replace each artwork's one current
-bidder record. Contact details are private to the owner.
+NedsShop is a React/Vite gallery in `fontend/` with verified artwork bidding
+backed by Supabase. Every artwork starts at AUD $10 and has an AUD $75 cap.
+The first accepted, verified $75 bid locks its artwork. Other artworks close
+at noon on 28 October 2026, Sydney time. Higher bids replace each artwork's
+one current bidder record. Contact details are private to the owner.
 
-Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) to apply the database SQL, connect
-the website, create the owner account and configure scheduled Gmail winner
-emails. Production bidding stays disabled until setup is complete. No live
-Supabase database changes or deployment have been performed.
+Follow the [Supabase setup guide](supabase/README.md) to apply migrations,
+configure email verification, connect the website, create the owner account,
+and schedule Gmail winner emails. Keep bidding paused until setup is complete.
 
 See the [frontend guide](fontend/README.md) for gallery editing and commands,
 and [backend verification](backend/README.md) for database and mail tests.
 
 ```text
 NedsShop/
-|-- fontend/                  React gallery, guest bids and owner page
+|-- fontend/                  React gallery, verified bids and owner page
 |   |-- src/components/       Gallery, artwork information and bid form
 |   |-- src/data/artworks.js  Public artwork metadata and $10 starting prices
 |   |-- src/hooks/            Auction refresh state
@@ -25,9 +25,11 @@ NedsShop/
 |-- supabase/
 |   |-- migrations/           Database schema, access rules and artwork seed
 |   |-- functions/            Scheduled Gmail winner-email worker
+|   |-- templates/            Bid verification email template
+|   |-- artworks.sql          Generated artwork listing updates
 |   |-- schedule.sql          Supabase Cron jobs
+|   |-- README.md             Database, Auth SMTP and deployment steps
 |-- backend/tests/            PostgreSQL and email-worker verification
-|-- SUPABASE_SETUP.md         Database, credentials and deployment steps
 ```
 
 ## Run locally
@@ -41,7 +43,7 @@ npm run dev
 ```
 
 The gallery can preview without configuration. Live bidding requires the
-Supabase variables and setup described in SUPABASE_SETUP.md.
+Supabase variables and the setup described in `supabase/README.md`.
 Run `npm test`, `npm run lint` and `npm run build` from `fontend` to check changes.
 Use `npm run preview` to inspect the production build.
 
@@ -59,7 +61,7 @@ Use `npm run preview` to inspect the production build.
 - Put shared formatting helpers in `utils`, reusable state/effects in `hooks`
   and future browser API requests in `services` as concrete needs arise.
 - Use the Supabase functions for bid acceptance, deadlines and winners.
-  Follow `SUPABASE_SETUP.md` before enabling real bids.
+  Follow `supabase/README.md` before enabling real bids.
 - Keep secrets, buyer records and private permission evidence out of frontend
   source and public assets. Database changes and policies belong in
   `supabase/migrations`.

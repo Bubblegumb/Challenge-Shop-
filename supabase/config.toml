@@ -1,5 +1,21 @@
 project_id = "nedsshop"
 
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+double_confirm_changes = true
+max_frequency = "60s"
+otp_length = 6
+otp_expiry = 600
+
+[auth.email.template.confirmation]
+subject = "Your Sujal's Challenge verification code"
+content_path = "./supabase/templates/bid-code.html"
+
+[auth.email.template.magic_link]
+subject = "Your Sujal's Challenge verification code"
+content_path = "./supabase/templates/bid-code.html"
+
 [functions.winner-mail]
 verify_jwt = false
 entrypoint = "./functions/winner-mail/index.js"

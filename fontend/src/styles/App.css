@@ -991,6 +991,70 @@ footer p {
 .bid-dialog .bid-minimum { padding-block: 12px; border-block: 1px solid var(--line); }
 .bid-terms { color: var(--ink); }
 .bid-collection-note, .auction-form .bid-note { color: var(--muted); }
+.bid-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--line);
+  list-style: none;
+  counter-reset: bid-step;
+  font-size: 11px;
+  color: var(--muted);
+}
+.bid-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  counter-increment: bid-step;
+}
+.bid-steps li::before {
+  content: counter(bid-step);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.bid-steps [aria-current="step"] { color: var(--olive); font-weight: 600; }
+.bid-steps [aria-current="step"]::before {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: var(--paper);
+}
+.bid-verification {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: #ebe5d8;
+}
+.bid-verification input {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .25em;
+}
+.bid-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 16px;
+}
+.bid-secondary {
+  min-height: 44px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--olive);
+  font-size: 11px;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.bid-secondary:focus-visible { outline-color: var(--olive); }
+.bid-dialog .bid-note:empty { display: none; }
 .auction-form { display: grid; gap: 16px; }
 .auction-form label { display: grid; gap: 6px; font-size: 12px; }
 .auction-form input {
@@ -1003,6 +1067,7 @@ footer p {
   background: #fffcf5;
   color: var(--ink);
 }
+.auction-form input:disabled { background: #ece6d9; color: var(--muted); opacity: 1; }
 .auction-form input:focus-visible {
   border-color: var(--olive);
   outline: 2px solid var(--olive);

@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { AUCTION_CLOSES_AT, biddingClosed, formatBid, parseBidCents } from '../src/utils/bidding.js'
+import { AUCTION_CLOSES_AT, BID_CAP_CENTS, biddingClosed, formatBid, parseBidCents } from '../src/utils/bidding.js'
 
 test('bid amounts preserve exact cents and reject invalid or sub-$10 input', () => {
   assert.equal(parseBidCents('10'), 1000)
   assert.equal(parseBidCents('10.01'), 1001)
   assert.equal(parseBidCents('15.50'), 1550)
-  for (const invalid of ['', '9.99', '-10', '10.001', '1e4', 'Infinity', '1000001']) {
+  assert.equal(parseBidCents('74.99'), 7499)
+  assert.equal(parseBidCents('75'), BID_CAP_CENTS)
+  assert.equal(parseBidCents('75.00'), BID_CAP_CENTS)
+  for (const invalid of ['', '9.99', '-10', '10.001', '1e4', 'Infinity', '75.01', '76', '1000001']) {
     assert.equal(parseBidCents(invalid), null)
   }
   assert.equal(formatBid(1551), '$15.51')

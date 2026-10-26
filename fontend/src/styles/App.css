@@ -86,14 +86,28 @@ main {
 .collection-switch {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 0;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 12px;
   min-height: 44px;
-  border: 0;
-  background: transparent;
+  border: 1px solid var(--brass);
+  border-radius: 4px;
+  background: #c6ae7d12;
   font: inherit;
   letter-spacing: inherit;
   text-align: left;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.collection-switch-label {
+  color: var(--brass);
+  font: 10px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .5px;
+}
+
+.collection-switch:hover {
+  background: #c6ae7d26;
+  box-shadow: 0 0 0 1px var(--brass);
 }
 
 .collection-switch svg {
@@ -101,7 +115,7 @@ main {
   height: 32px;
   flex-shrink: 0;
   padding: 6px;
-  border: 1px solid var(--wall-line);
+  border: 1px solid var(--brass);
   border-radius: 50%;
   color: var(--brass);
   transition: background-color 160ms ease, border-color 160ms ease;
@@ -941,7 +955,7 @@ footer p {
     transform: none;
   }
 
-  .info-button > span, .paging button, .collection-switch svg {
+  .info-button > span, .paging button, .collection-switch, .collection-switch svg {
     transition: none;
   }
 }

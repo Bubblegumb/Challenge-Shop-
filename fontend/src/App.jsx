@@ -71,6 +71,7 @@ function AuctionGallery() {
                 title={`View ${nextCollection.title.toLowerCase()}`}
               >
                 {collection.title}
+                <span className="collection-switch-label">Switch collection</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                   <path d="M4 8h16m-4-4 4 4-4 4M20 16H4m4-4-4 4 4 4" />
                 </svg>

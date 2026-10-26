@@ -162,19 +162,22 @@ const collectionDefinitions = [
       {
         id: 'second-study-6',
         image: '16.jpg',
-        title: 'Study No. 06',
+        title: 'A Hand',
+        description: 'A hand held out is rarely asking for much: it is someone hoping to be noticed, and a quiet nudge for the rest of us to take it.',
         priceCents: 1000,
       },
       {
         id: 'second-study-7',
         image: '17.jpg',
-        title: 'Study No. 07',
+        title: 'The First Night',
+        description: 'The first night is when it becomes real: the lights go out around you, the street goes quiet, and nobody knows where you are.',
         priceCents: 1000,
       },
       {
         id: 'second-study-8',
         image: '18.jpg',
-        title: 'Study No. 08',
+        title: 'The First Breakfast',
+        description: 'The first breakfast is where the story starts to turn: a warm meal, a morning that came anyway, and proof that someone thought of you.',
         priceCents: 1000,
       },
       {

@@ -18,7 +18,7 @@ body {
 }
 
 .site-header {
-  min-height: 76px;
+  min-height: 64px;
   margin-inline: 5%;
   display: flex;
   align-items: center;
@@ -69,8 +69,8 @@ main {
 }
 
 .exhibition-note {
-  min-height: 76px;
-  padding-block: 15px;
+  min-height: 64px;
+  padding-block: 10px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -112,13 +112,29 @@ main {
   background: #ffffff12;
 }
 
-.exhibition-note > span {
+.exhibition-meta {
+  max-width: 460px;
   color: var(--wall-muted);
   font-size: 11px;
+  text-align: right;
 }
 
-.exhibition-note > span > span {
+.exhibition-meta > span > span {
   padding-inline: 7px;
+}
+
+.gallery-status {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.gallery-status:empty {
+  display: none;
+}
+
+.gallery-status[role="alert"] {
+  color: #f0b9a5;
 }
 
 .eyebrow {
@@ -127,10 +143,10 @@ main {
   text-transform: uppercase;
 }
 
-/* Equal outer columns center the painting itself, with labels to the right. */
+/* Give the artwork the wall; keep its accompanying label quiet and compact. */
 
 .gallery {
-  --exhibit-gap: clamp(20px, 3vw, 48px);
+  --exhibit-gap: clamp(24px, 4vw, 64px);
   position: relative;
   isolation: isolate;
   min-height: 0;
@@ -165,23 +181,25 @@ main {
   min-width: 0;
   min-height: 0;
   overflow: clip;
-  padding: 22px 5% 36px;
+  padding: 16px 5% 28px;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
 .artwork-display {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.85fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 210px;
   align-items: center;
   gap: var(--exhibit-gap);
   height: 100%;
   width: 100%;
   min-width: 0;
+  max-width: 1480px;
+  margin-inline: auto;
 }
 
 .hanging-work {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
   position: relative;
   display: flex;
@@ -190,20 +208,18 @@ main {
   align-items: center;
   justify-content: center;
   container-type: size;
-  transform-style: preserve-3d;
-  transform: perspective(1800px) rotateY(-2deg);
 }
 
 .artwork-frame {
   position: relative;
   flex: none;
-  /* Fit both wall dimensions while preserving the portrait frame proportions. */
-  width: min(100cqw, 94cqh, 714.4px);
+  /* Fit the actual image proportions to both available wall dimensions. */
+  width: min(100cqw, calc(100cqh * var(--artwork-ratio)), 1100px);
   max-width: 100%;
   height: auto;
-  max-height: 760px;
-  aspect-ratio: .94;
-  padding: 15px;
+  max-height: 900px;
+  aspect-ratio: var(--artwork-ratio);
+  padding: 10px;
   border: 2px solid #38291e;
   background: repeating-linear-gradient(92deg, #20160c0d 0 1px, transparent 1px 6px),
     linear-gradient(110deg, #82603d, #533b26 18%, #493321 80%, #8a6944);
@@ -238,7 +254,7 @@ main {
 
 .artwork-mat {
   height: 100%;
-  padding: clamp(12px, 2vw, 28px);
+  padding: clamp(10px, 1.2vw, 18px);
   background: #f2eadb;
   box-shadow: inset 2px 3px 6px #3022144d;
   transform: translateZ(1px);
@@ -255,64 +271,62 @@ main {
 
 .frame-glass {
   position: absolute;
-  inset: 16px;
+  inset: 11px;
   transform: translateZ(3px);
   background: linear-gradient(120deg, #ffffff09, transparent 45%);
   pointer-events: none;
 }
 
-/* Small, readable paper labels act as guides rather than competing exhibits. */
+/* Wall-coloured labels let the artwork remain the brightest part of the page. */
 
 .artwork-sidebar {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
-  width: min(100%, 200px);
+  width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   overflow-wrap: anywhere;
 }
 
 .artwork-summary, .price-plaque {
-  color: var(--ink);
-  background: linear-gradient(150deg, #fff8, transparent 70%), var(--paper);
-  border: 1px solid #d0c5b0;
-  box-shadow: 1px 2px 2px #17191125, 3px 5px 10px #17191133;
+  color: var(--wall-ink);
 }
 
 .artwork-summary {
-  padding: 17px 18px 19px;
-  border-top: 2px solid #a68b5c;
+  padding-top: 16px;
+  border-top: 1px solid var(--wall-line);
 }
 
 .work-number {
-  color: var(--muted);
+  color: var(--wall-muted);
   font-size: 9px;
   letter-spacing: .8px;
   text-transform: uppercase;
 }
 
 .artwork-summary h2 {
-  font-size: clamp(20px, 1.8vw, 25px);
+  font-size: clamp(23px, 2vw, 30px);
   line-height: 1.25;
   margin-top: 9px;
 }
 
 .price-plaque {
-  align-self: flex-start;
+  align-self: stretch;
   max-width: 100%;
-  padding: 11px 18px 13px;
+  padding-top: 16px;
+  border-top: 1px solid var(--wall-line);
 }
 
 .price-plaque .eyebrow {
-  color: var(--muted);
+  color: var(--wall-muted);
   font-size: 9px;
   letter-spacing: 1px;
 }
 
 .price-plaque p {
-  font: 24px/1.3 Georgia, serif;
+  font: 28px/1.3 Georgia, serif;
   margin-top: 5px;
 }
 
@@ -320,7 +334,7 @@ main {
   font: 10px Arial, sans-serif;
   letter-spacing: .6px;
   margin-left: 3px;
-  color: var(--muted);
+  color: var(--wall-muted);
 }
 
 .price-plaque .price-pending {
@@ -329,8 +343,8 @@ main {
 
 .info-button {
   position: absolute;
-  right: 23px;
-  bottom: 23px;
+  right: 10px;
+  bottom: 10px;
   z-index: 2;
   width: 44px;
   height: 44px;
@@ -376,7 +390,7 @@ main {
 
 .gallery-controls {
   margin: 0 5%;
-  padding: 10px 0 17px;
+  padding: 8px 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -421,7 +435,7 @@ main {
 }
 
 footer {
-  padding: 12px 5% 14px;
+  padding: 10px 5% 12px;
   font-size: 10px;
   line-height: 1.7;
   color: var(--wall-muted);
@@ -556,7 +570,7 @@ footer p {
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 760px) {
   .site-header {
     min-height: 62px;
     gap: 10px;
@@ -584,18 +598,18 @@ footer p {
     padding-block: 12px;
   }
 
-  .exhibition-note > span {
+  .exhibition-meta {
     font-size: 10px;
   }
 
   .artwork-slide {
-    padding: 10px 8% 23px;
+    padding: 10px 5% 20px;
   }
 
   .artwork-display {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
-    gap: 23px;
+    gap: 18px;
   }
 
   .hanging-work {
@@ -607,7 +621,7 @@ footer p {
   }
 
   .artwork-mat {
-    padding: clamp(10px, 2vw, 20px);
+    padding: clamp(8px, 2vw, 14px);
   }
 
   .frame-glass {
@@ -615,27 +629,31 @@ footer p {
   }
 
   .info-button {
-    right: 17px;
-    bottom: 17px;
+    right: 7px;
+    bottom: 7px;
   }
 
   .artwork-sidebar {
     grid-column: 1;
     grid-row: 2;
     flex-direction: row;
-    justify-self: center;
+    justify-self: stretch;
     align-items: stretch;
-    width: auto;
+    width: 100%;
     max-width: 100%;
-    gap: 10px;
+    gap: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--wall-line);
   }
 
   .artwork-summary {
-    padding: 11px 14px 13px;
+    padding: 0;
+    border: 0;
+    flex: 1;
   }
 
   .artwork-summary h2 {
-    font-size: 20px;
+    font-size: 22px;
     margin-top: 5px;
   }
 
@@ -649,7 +667,9 @@ footer p {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 11px 14px;
+    padding: 0 0 0 20px;
+    border-top: 0;
+    border-left: 1px solid var(--wall-line);
     flex-shrink: 0;
   }
 
@@ -658,7 +678,7 @@ footer p {
   }
 
   .price-plaque p {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .gallery-controls {
@@ -779,7 +799,7 @@ footer p {
   }
 
   .exhibition-note {
-    min-height: 75px;
+    min-height: 72px;
     display: block;
     padding-block: 6px 10px;
   }
@@ -788,30 +808,31 @@ footer p {
     font-size: 24px;
   }
 
-  .exhibition-note > span {
+  .exhibition-meta {
     display: block;
     margin-top: 2px;
+    text-align: left;
   }
 
   .artwork-slide {
-    padding-inline: 7%;
+    padding-inline: 5%;
     padding-bottom: 17px;
   }
 
   .artwork-display {
-    gap: 20px;
+    gap: 16px;
   }
 
   .artwork-sidebar {
-    gap: 8px;
+    gap: 14px;
   }
 
   .artwork-summary {
-    padding-inline: 12px;
+    padding: 0;
   }
 
   .artwork-summary h2 {
-    font-size: 19px;
+    font-size: 21px;
   }
 
   .work-number {
@@ -819,7 +840,7 @@ footer p {
   }
 
   .price-plaque {
-    padding-inline: 12px;
+    padding-inline: 14px 0;
   }
 
   .browse-hint {
@@ -866,25 +887,28 @@ footer p {
   }
 
   .artwork-display {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.85fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 190px;
     grid-template-rows: minmax(0, 1fr);
   }
 
   .hanging-work {
-    grid-column: 2;
+    grid-column: 1;
   }
 
   .artwork-sidebar {
-    grid-column: 3;
+    grid-column: 2;
     grid-row: 1;
     flex-direction: column;
     align-items: flex-start;
     justify-self: start;
     gap: 8px;
+    border: 0;
+    padding: 0;
   }
 
   .artwork-summary {
-    padding: 10px 12px;
+    padding: 8px 0 0;
+    border-top: 1px solid var(--wall-line);
   }
 
   .artwork-summary h2 {
@@ -892,8 +916,10 @@ footer p {
   }
 
   .price-plaque {
-    align-self: flex-start;
-    padding: 8px 12px;
+    align-self: stretch;
+    padding: 8px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--wall-line);
   }
 
   .price-plaque p {
@@ -918,4 +944,85 @@ footer p {
   .info-button > span, .paging button, .collection-switch svg {
     transition: none;
   }
+}
+
+.auction-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--olive);
+  border-radius: 0;
+  padding: 10px 18px;
+  background: var(--olive);
+  color: var(--paper);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: .35px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.auction-button:not(:disabled):hover {
+  background: #3c4530;
+  border-color: #3c4530;
+}
+.auction-button:disabled { opacity: .65; cursor: default; }
+.price-plaque .auction-button {
+  display: flex;
+  width: 100%;
+  margin-top: 16px;
+  border-color: var(--brass);
+  background: transparent;
+  color: var(--wall-ink);
+}
+.price-plaque .auction-button:not(:disabled):hover {
+  background: var(--brass);
+  color: var(--wall);
+}
+.price-plaque .auction-button:disabled {
+  border-color: var(--wall-line);
+  color: var(--wall-muted);
+}
+.bid-note { display: block; font-size: 11px; line-height: 1.6; }
+.price-plaque .bid-note { margin-top: 6px; color: var(--wall-muted); }
+.bid-dialog { max-width: 520px; }
+.bid-dialog .dialog-content { padding: clamp(20px, 4vw, 32px); gap: 16px; }
+.bid-dialog p { font-size: 12px; line-height: 1.6; }
+.bid-dialog .bid-minimum { padding-block: 12px; border-block: 1px solid var(--line); }
+.bid-terms { color: var(--ink); }
+.bid-collection-note, .auction-form .bid-note { color: var(--muted); }
+.auction-form { display: grid; gap: 16px; }
+.auction-form label { display: grid; gap: 6px; font-size: 12px; }
+.auction-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fffcf5;
+  color: var(--ink);
+}
+.auction-form input:focus-visible {
+  border-color: var(--olive);
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+.auction-form .auction-button:focus-visible {
+  outline-color: var(--olive);
+}
+.auction-form .bid-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.auction-error { color: #9b3028; }
+.owner-page { display: block; width: 100%; max-width: 1200px; margin: 0 auto; padding: 32px 5%; grid-row: 1 / -1; }
+.owner-page > .auction-form { max-width: 420px; }
+.owner-controls { display: flex; gap: 12px; }
+.owner-table-wrap { overflow-x: auto; margin-top: 24px; }
+.owner-page table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.owner-page th, .owner-page td { padding: 12px; text-align: left; border-bottom: 1px solid #82725e; }
+.owner-page caption { text-align: left; margin-bottom: 12px; }
+@media (max-width: 480px) {
+  .artwork-summary, .price-plaque { min-width: 0; }
+  .price-plaque { flex-shrink: 1; }
+  .price-plaque .bid-note { font-size: 10px; }
+  .price-plaque .auction-button { padding: 8px 10px; font-size: 11px; margin-top: 10px; }
 }

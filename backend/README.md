@@ -1,48 +1,29 @@
-# NedsShop backend plan
+# Auction backend verification
 
-This package reserves space for a future artwork-auction backend. No server,
-routes, authentication, payments, database migrations or tests are implemented.
-The package has no dependencies or run scripts. The current frontend gallery
-runs independently of this package.
+The auction runs in Supabase rather than a separate Node HTTP server. The
+canonical migration is `../supabase/migrations/202610260001_auction.sql`.
+The Gmail worker is in `../supabase/functions/winner-mail/`.
 
-Comment-only source placeholders have been removed. Add executable modules and
-their tests when implementing the responsibilities below.
+Follow [SUPABASE_SETUP.md](../SUPABASE_SETUP.md) to configure the approved project,
+owner account, Gmail, and scheduled winner emails.
 
-```text
-backend/
-|-- database/
-|   |-- README.md                 Database implementation guidance
-|   |-- migrations/               Reserved for ordered schema changes
-|-- tests/                        Reserved for future backend tests
-|-- .env.example                  Safe configuration template
-|-- .gitignore                    Includes local .env files
-|-- package.json                  Future server package metadata
-|-- package-lock.json             Dependency-free npm lockfile
-```
+Run `npm.cmd ci`, then `npm.cmd test` in this directory. Tests execute the actual
+migration in PGlite (PostgreSQL compiled to WASM), with test Supabase roles and
+`auth.uid()`. They verify contact replacement, private access, deadline checks,
+finalization, email job recovery, and winner email content. PGlite uses one
+connection; a multi-session test Supabase rehearsal and real Gmail delivery test
+remain production checks.
 
-## Planned responsibilities
+The website calls `auction_snapshot()` and `submit_bid(...)`. The database owns
+prices, atomic contact replacement, row locks, and the cutoff. Owner functions
+check `auth.uid()` against the allowlist. Only the service role can finalize
+auctions and process email jobs.
 
-Start with application setup, HTTP startup, configuration validation and a
-health endpoint. Install the selected server framework and add run scripts
-when there is executable server code.
+The design review selected managed SQL and serverless processing over a hosted
+Node and SQLite service to fit the Vercel frontend. Restart catch-up was kept.
+Bid history was replaced with one overwritten leader following the user's
+instruction.
 
-Organize feature modules around artworks, authentication, bids and orders.
-Routes should map URLs to handlers; controllers should validate HTTP input and
-shape responses; services should own server operations and database access.
-Create these files as each feature is implemented and tested.
-
-Shared middleware should verify sessions, derive authenticated identity,
-require a server-controlled admin role and return consistent errors without
-exposing private data. A server-only database client should centralize database
-connections. Auction finalisation should run transactionally and create at most
-one order per artwork.
-
-Real bid checks and updates must run atomically in a database transaction.
-Keep secrets on the server, outside frontend code and `VITE_` variables.
-Database schema changes, constraints, indexes and access policies belong in
-`backend/database/migrations` from the repository root, or `database/migrations`
-from this directory.
-
-Follow sections 6-9 of [the learning guide](../WEBSITE_LEARNING_GUIDE.md).
-After the initial server setup, add public listings, database access, verified
-sessions, bidding and orders in stages, with tests for each implemented feature.
+Run `npm.cmd run check:auction` in `fontend` to verify that the migration seeds
+match the gallery. Future event rescheduling requires updating both database
+settings and `fontend/src/utils/bidding.js`.

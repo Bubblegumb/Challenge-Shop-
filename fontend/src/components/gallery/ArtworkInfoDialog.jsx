@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { formatPrice } from '../../utils/formatters'
+import { COLLECTION_NOTE } from '../../utils/bidding'
 
 export default function ArtworkInfoDialog({ artwork, onClose }) {
   const dialog = useRef(null)
@@ -25,7 +26,7 @@ export default function ArtworkInfoDialog({ artwork, onClose }) {
     ['Condition', artwork.condition],
     ['Starting price', artwork.priceCents == null ? 'To be confirmed' : `${formatPrice(artwork.priceCents)} AUD`],
     ['Framing', artwork.frame, 'fact-long'],
-    ['Collection & postage', 'Collection area to be confirmed; optional postage by quote.', 'fact-long'],
+    ['Collection', COLLECTION_NOTE, 'fact-long'],
   ] : []
 
   return (

@@ -1,11 +1,12 @@
 # Sujal's Challenge frontend
 
-React 19 + Vite 8 frontend for the NedsShop artwork gallery and auction learning
-project. The current app previews two collections of ten planned works each:
-ten images in the first and one supplied image in the second. Artist stories,
-materials, dimensions and condition are included. Starting prices use AUD;
-Unseen starts at $30 and the remaining second-collection prices await
-confirmation. Purchases and bids are not open.
+React 19 + Vite 8 gallery with Supabase guest bidding. The first collection
+shows ten pieces and the second currently shows five. Every piece starts at
+AUD $10. Bidding closes at noon on 28 October 2026, Sydney time.
+
+Follow [SUPABASE_SETUP.md](../SUPABASE_SETUP.md) to connect the database,
+configure owner access, schedule winner emails and enable bidding. The gallery
+can preview before setup; live bidding remains unavailable until configured.
 
 The directory name `fontend` is intentional in the commands below: it matches
 this repository's existing spelling.
@@ -23,8 +24,8 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. No backend service or environment variables
-are needed for the current gallery.
+Open the local URL printed by Vite. Use `.env.example` to prepare `.env.local`
+for Supabase. The gallery can preview without credentials.
 
 Run these commands from `fontend`:
 
@@ -75,8 +76,10 @@ Run these commands from `fontend`:
   AI-modified, AI-generated or inspired artwork, rather than originals by the
   referenced artists.
 
-Login, bid submission, payments and backend requests are not implemented.
-The starting-price plaque is a display component, not a bidding form.
+Guest bidding collects amount, name and email. The database replaces each
+artwork's current leader atomically and never returns contacts to public users.
+The `#owner` page requires an allowlisted Supabase Auth account. Winner email
+processing runs in Supabase; payment is an external donation confirmed manually.
 
 ## Source guide
 
@@ -98,7 +101,7 @@ The starting-price plaque is a display component, not a bidding form.
 | `tests/` | Node tests for utilities, artwork contracts and rendered gallery behavior. |
 
 Empty auth, fundraising, navigation and bid-form scaffolds have been removed.
-The pages, hooks and services directories remain reserved for future work.
+The pages, hooks and services directories contain owner access and auction code.
 The public starter SVGs remain available to preserve their existing URLs.
 
 ## Update the collections
@@ -108,8 +111,8 @@ the same object structure: collection metadata, a `defaults` object for shared
 details, and an `artworks` array of objects. Each artwork keeps its `image`,
 `title`, `description`, `medium`, `priceCents` and optional `alt` together.
 Artwork fields override collection defaults. Amounts are stored in cents:
-`1500` means AUD $15. The current formatter displays whole dollars, so
-fractional-dollar prices will be rounded for display.
+`1000` means AUD $10 and is required for every starting price. Live bid amounts
+preserve exact cents. Run `npm run sync:auction` after changing gallery listings.
 
 The first collection lists images `1.jpg` through `10.jpg`. The existing
 `artworks` export remains available as an alias of the first collection's
@@ -119,9 +122,8 @@ collection labels and display numbers for the gallery.
 The second collection uses `src/assets/11.jpg` through `src/assets/20.jpg`,
 including only images that exist. `11.jpg` is its work 01. Add `12.jpg` through
 `20.jpg` as they become available; they appear automatically in numbered order
-without showing empty slides. Edit each artwork object's `priceCents` when
-prices are confirmed. `null` displays
-"To be confirmed" in the price plaque and information dialog.
+without showing empty slides. Keep each artwork's `priceCents` at `1000`. Run `npm run sync:auction` when adding
+new photos, then apply the updated Supabase setup SQL.
 
 Replace the numbered files to change the photos. If you change file types,
 update the `.jpg` glob and each object's `image` filename. Set each collection's
@@ -130,7 +132,7 @@ available and planned counts; gallery controls use the selected collection's
 available artwork count.
 
 Future second-collection works retain placeholder titles, descriptions and
-unconfirmed prices. Update those objects as details become available.
+the $10 starting price. Update their titles and descriptions as details become available.
 All pieces are unframed works on paper; the frame is a digital presentation.
 Frontend data and bundled images are public, so keep private records and secrets
 out of these files.

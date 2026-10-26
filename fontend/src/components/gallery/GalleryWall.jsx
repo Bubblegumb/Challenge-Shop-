@@ -6,7 +6,7 @@ import { animateGalleryScroll } from '../../utils/animateGalleryScroll'
 import ArtworkDisplay from './ArtworkDisplay'
 import ArtworkInfoDialog from './ArtworkInfoDialog'
 
-export default function GalleryWall({ collection = collections[0] }) {
+export default function GalleryWall({ collection = collections[0], auction, canBid, closed, onBid }) {
   const { artworks } = collection
   const wall = useRef(null)
   const activeSlide = useRef(0)
@@ -105,7 +105,7 @@ export default function GalleryWall({ collection = collections[0] }) {
       >
         {artworks.map((artwork, index) => (
           <div className="artwork-slide" key={artwork.id} inert={index !== active} aria-hidden={index !== active}>
-            <ArtworkDisplay artwork={artwork} onInfo={setSelected} />
+            <ArtworkDisplay artwork={artwork} onInfo={setSelected} auction={auction} canBid={canBid} closed={closed} onBid={onBid} />
           </div>
         ))}
       </div>

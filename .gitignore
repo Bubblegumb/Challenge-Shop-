@@ -3,3 +3,8 @@ WEBSITE_LEARNING_GUIDE.md
 FEATURE_COMPLETION_GUIDE.md
 AUDIT_REPORT.md
 decisions
+.env
+.env.*
+!.env.example
+/supabase/.temp/
+SUPABASE_SETUP.md

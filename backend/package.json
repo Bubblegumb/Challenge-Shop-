@@ -3,5 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Backend scaffold for the NedsShop artwork auction"
+  "description": "Supabase auction verification",
+  "scripts": { "test": "node --test" },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11"
+  }
 }

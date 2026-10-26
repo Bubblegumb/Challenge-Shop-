@@ -1,0 +1,5 @@
+project_id = "nedsshop"
+
+[functions.winner-mail]
+verify_jwt = false
+entrypoint = "./functions/winner-mail/index.js"

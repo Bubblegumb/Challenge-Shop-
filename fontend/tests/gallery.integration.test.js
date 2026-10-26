@@ -15,6 +15,8 @@ let GalleryWall
 let ArtworkFrame
 let ArtworkInfoDialog
 let BidPlaque
+let BidDialog
+let OwnerPage
 let App
 
 before(async () => {
@@ -32,6 +34,8 @@ before(async () => {
     server.ssrLoadModule('/src/components/gallery/ArtworkInfoDialog.jsx'),
     server.ssrLoadModule('/src/components/bidding/BidPlaque.jsx'),
     server.ssrLoadModule('/src/App.jsx'),
+    server.ssrLoadModule('/src/components/bidding/BidDialog.jsx'),
+    server.ssrLoadModule('/src/pages/OwnerPage.jsx'),
   ])
   artworkData = modules[0]
   formatters = modules[1]
@@ -40,6 +44,8 @@ before(async () => {
   ArtworkInfoDialog = modules[4].default
   BidPlaque = modules[5].default
   App = modules[6].default
+  BidDialog = modules[7].default
+  OwnerPage = modules[8].default
 })
 
 after(async () => {
@@ -53,7 +59,7 @@ test('all ten artwork records retain stable IDs, valid cent prices and resolving
   await Promise.all(artworkData.artworks.map(async (artwork, index) => {
     assert.equal(artwork.id, `study-${index + 1}`)
     assert.ok(Number.isInteger(artwork.priceCents), `${artwork.id} price must use integer cents`)
-    assert.ok(artwork.priceCents >= 0, `${artwork.id} price must be nonnegative`)
+    assert.equal(artwork.priceCents, 1000, `${artwork.id} must start at $10`)
     assert.equal(artwork.number, formatters.formatArtworkNumber(index + 1))
     assert.equal(artwork.title, `Study No. ${artwork.number}`)
     assert.equal(typeof artwork.imageUrl, 'string')
@@ -89,7 +95,7 @@ test('both collections plan ten works and the second includes only supplied imag
     assert.equal(artwork.id, `second-study-${workNumber}`)
     assert.equal(artwork.number, formatters.formatArtworkNumber(workNumber))
     assert.equal(artwork.collectionTitle, second.title)
-    assert.ok(artwork.priceCents === null || (Number.isInteger(artwork.priceCents) && artwork.priceCents >= 0))
+    assert.equal(artwork.priceCents, 1000)
     const imagePath = decodeURIComponent(new URL(artwork.imageUrl, 'http://localhost').pathname)
     assert.equal(imagePath, `/src/assets/${photoNumbers[index]}.jpg`)
     assert.ok((await stat(resolve(projectRoot, imagePath.slice(1)))).isFile())
@@ -178,13 +184,13 @@ test('selected artwork information retains the description and six guide facts',
   const markup = renderToStaticMarkup(createElement(ArtworkInfoDialog, { artwork, onClose() {} }))
   const facts = Object.fromEntries([...markup.matchAll(/<dt>([^<]*)<\/dt><dd>([^<]*)<\/dd>/g)].map(match => [match[1], match[2]]))
 
-  assert.deepEqual(Object.keys(facts), ['Medium', 'Dimensions', 'Condition', 'Starting price', 'Framing', 'Collection &amp; postage'])
+  assert.deepEqual(Object.keys(facts), ['Medium', 'Dimensions', 'Condition', 'Starting price', 'Framing', 'Collection'])
   assert.equal(facts.Medium, artwork.medium)
   assert.equal(facts.Dimensions, artwork.dimensions)
   assert.equal(facts.Condition, artwork.condition)
   assert.equal(facts['Starting price'], `${formatters.formatPrice(artwork.priceCents)} AUD`)
   assert.equal(facts.Framing, artwork.frame)
-  assert.equal(facts['Collection &amp; postage'], 'Collection area to be confirmed; optional postage by quote.')
+    assert.match(facts.Collection, /Collection at the State Library during a one-hour window/)
   assert.ok(markup.includes(artwork.description))
   assert.match(markup, /\baria-labelledby="dialog-title"/)
   assert.match(markup, /\baria-describedby="dialog-description"/)
@@ -204,4 +210,41 @@ test('unconfirmed starting prices remain unconfirmed in the plaque and second-co
 test('an unselected information dialog has no stale artwork details', () => {
   const markup = renderToStaticMarkup(createElement(ArtworkInfoDialog, { artwork: null, onClose() {} }))
   assert.doesNotMatch(markup, /<dt>|id="dialog-title"|id="dialog-description"/)
+})
+
+test('live bid plaques show exact cents and disable new submissions after closing', () => {
+  const artwork = artworkData.artworks[0]
+  const open = renderToStaticMarkup(createElement(BidPlaque, {
+    artwork, lot: { highest_amount_cents: 1551 }, canBid: true, onBid() {},
+  }))
+  assert.match(open, /Highest bid/)
+  assert.match(open, /\$15\.51/)
+  assert.match(open, /Unframed/)
+  assert.doesNotMatch(open, /<button[^>]*disabled/)
+  const closed = renderToStaticMarkup(createElement(BidPlaque, {
+    artwork, closed: true, onBid() {},
+  }))
+  assert.match(closed, /<button[^>]*disabled/)
+  assert.match(closed, /Bidding closed/)
+})
+
+test('guest bidding collects only amount and contact details with clear payment and collection instructions', () => {
+  const markup = renderToStaticMarkup(createElement(BidDialog, {
+    artwork: artworkData.artworks[0], lot: { highest_amount_cents: 1551 }, onClose() {}, onAccepted() {},
+  }))
+  const visibleInputNames = [...markup.matchAll(/<input[^>]*name="([^"]+)"/g)]
+    .map(match => match[1]).filter(name => name !== 'website')
+  assert.deepEqual(visibleInputNames, ['amount', 'name', 'email'])
+  assert.match(markup, /Minimum bid: \$15\.52 AUD/)
+  assert.match(markup, /Unframed artwork\. No frame is included/)
+  assert.match(markup, /State Library during a one-hour window/)
+  assert.match(markup, /donate your exact winning bid/)
+  assert.doesNotMatch(markup, /name="password"|name="phone"/)
+})
+
+test('owner page exposes no bidder contacts before owner authentication', () => {
+  const markup = renderToStaticMarkup(createElement(OwnerPage))
+  assert.match(markup, /type="password"/)
+  assert.match(markup, /Bidders do not need an account/)
+  assert.doesNotMatch(markup, /<table|Highest bids and collection payments/)
 })

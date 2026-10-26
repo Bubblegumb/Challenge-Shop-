@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "test": "node --test",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:auction": "node scripts/sync-auction.mjs",
+    "check:auction": "node scripts/sync-auction.mjs --check"
   },
   "dependencies": {
     "react": "^19.2.8",

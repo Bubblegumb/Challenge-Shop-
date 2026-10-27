@@ -1,7 +1,7 @@
-export const AUCTION_CLOSES_AT = '2026-10-28T01:00:00.000Z'
-export const AUCTION_DEADLINE_LABEL = '28 October 2026 at 12 noon (Sydney time)'
+export const AUCTION_CLOSES_AT = '2026-10-28T12:59:00.000Z'
+export const AUCTION_DEADLINE_LABEL = '28 October 2026 at 11:59 pm (Sydney time)'
 export const BID_CAP_CENTS = 7500
-export const COLLECTION_NOTE = 'Collection at the State Library during a one-hour window. The date, time and meeting point will be confirmed by email once the space is booked.'
+export const COLLECTION_NOTE = 'Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).'
 
 export function parseBidCents(value) {
   if (!/^\d{1,7}(?:\.\d{1,2})?$/.test(value)) return null

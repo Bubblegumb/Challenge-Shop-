@@ -3,7 +3,7 @@
 React 19 + Vite 8 gallery with Supabase email-verified bidding. The first collection
 shows ten pieces and the second currently shows five. Every piece starts at
 AUD $10 and has an AUD $75 cap. The first accepted $75 bid locks that artwork.
-Other artworks close at noon on 28 October 2026, Sydney time.
+Other artworks close at 11:59 pm on 28 October 2026, Sydney time.
 
 Follow the [Supabase setup guide](../supabase/README.md) to connect the database,
 configure Auth email codes and SMTP, set owner access, and schedule winner emails. The gallery

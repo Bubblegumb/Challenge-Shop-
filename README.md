@@ -3,7 +3,7 @@
 NedsShop is a React/Vite gallery in `fontend/` with verified artwork bidding
 backed by Supabase. Every artwork starts at AUD $10 and has an AUD $75 cap.
 The first accepted, verified $75 bid locks its artwork. Other artworks close
-at noon on 28 October 2026, Sydney time. Higher bids replace each artwork's
+at 11:59 pm on 28 October 2026, Sydney time. Higher bids replace each artwork's
 one current bidder record. Contact details are private to the owner.
 
 Follow the [Supabase setup guide](supabase/README.md) to apply migrations,

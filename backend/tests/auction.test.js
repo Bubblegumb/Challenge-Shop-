@@ -188,9 +188,19 @@ test('server-side cutoff works before finalization and new bids remain impossibl
   await assert.rejects(bid(2000, 'late@example.com'), /AUCTION_CLOSED/)
 })
 
-test('the approved timestamp is noon Sydney, equivalent to 01:00 UTC on 28 October', async () => {
-  const { rows } = await db.query("select '2026-10-28 12:00:00+11'::timestamptz as closes_at")
-  assert.equal(rows[0].closes_at.toISOString(), '2026-10-28T01:00:00.000Z')
+test('the deadline migration extends existing settings to 11:59 pm Sydney and updates the default', async () => {
+  await bid()
+  await db.exec("update auction_private.settings set closes_at = '2026-10-28 12:00:00+11', accepting_bids = false")
+  const migration = await readFile(new URL('../../supabase/migrations/202610280001_extend_auction_deadline.sql', import.meta.url), 'utf8')
+  await db.exec(migration)
+  const { rows } = await asRole('anon', () => db.query('select public.auction_snapshot() as result'))
+  assert.equal(new Date(rows[0].result.closes_at).toISOString(), '2026-10-28T12:59:00.000Z')
+  assert.equal(rows[0].result.accepting_bids, false)
+  assert.equal(rows[0].result.lots.find(lot => lot.id === 'study-1').highest_amount_cents, 1000)
+
+  await db.exec('update auction_private.settings set closes_at = default')
+  const settings = await db.query('select closes_at from auction_private.settings where id')
+  assert.equal(settings.rows[0].closes_at.toISOString(), '2026-10-28T12:59:00.000Z')
 })
 
 test('bidding remains disabled until explicitly opened and email throttling is enforced', async () => {
@@ -199,6 +209,19 @@ test('bidding remains disabled until explicitly opened and email throttling is e
   await db.exec('update auction_private.settings set accepting_bids = true')
   await bid()
   await assert.rejects(bid(1100), /RATE_LIMITED/)
+})
+
+test('the collection migration updates the current note and default to Friday 30 October from 1:00 pm to 1:55 pm', async () => {
+  await db.exec("update auction_private.settings set collection_note = 'Collection details to be confirmed.'")
+  const migration = await readFile(new URL('../../supabase/migrations/202610280002_confirm_collection_details.sql', import.meta.url), 'utf8')
+  await db.exec(migration)
+  const expected = 'Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).'
+  const settings = await db.query('select collection_note from auction_private.settings where id')
+  assert.equal(settings.rows[0].collection_note, expected)
+
+  await db.exec('update auction_private.settings set collection_note = default')
+  const defaults = await db.query('select collection_note from auction_private.settings where id')
+  assert.equal(defaults.rows[0].collection_note, expected)
 })
 
 test('only an allowlisted owner can see contacts or confirm a donation', async () => {
@@ -228,6 +251,7 @@ test('only service role can finalize or access email jobs; repeated finalization
   const claim = (await asRole('service_role', () => db.query('select public.claim_winner_email() as job'))).rows[0].job
   assert.equal(claim.payload.email, 'winner@example.com')
   assert.equal(claim.payload.amount_cents, 3000)
+  assert.equal(claim.payload.collection_note, 'Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).')
   assert.equal((await asRole('service_role', () => db.query('select public.claim_winner_email() as job'))).rows[0].job, null)
   await asRole('service_role', () => db.query('select public.finish_winner_email($1,$2,$3,$4,$5)',
     [claim.artwork_id, randomUUID(), 'accepted', 'wrong-worker', null]))

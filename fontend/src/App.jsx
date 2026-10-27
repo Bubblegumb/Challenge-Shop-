@@ -6,7 +6,7 @@ import BidDialog from './components/bidding/BidDialog'
 import OwnerPage from './pages/OwnerPage'
 import RecoveryPage from './pages/RecoveryPage'
 import { auctionConfigured, getAuction } from './services/auction'
-import { AUCTION_CLOSES_AT, biddingClosed } from './utils/bidding'
+import { AUCTION_CLOSES_AT, COLLECTION_NOTE, biddingClosed } from './utils/bidding'
 import './styles/App.css'
 
 export default function App() {
@@ -91,7 +91,7 @@ function AuctionGallery() {
           closed={closed} onClose={() => setBidArtwork(null)} onAccepted={accepted} />}
       </main>
       <footer>
-        <p>All artwork is unframed. Collection at the State Library during a one-hour window; booking details will be emailed to winners.</p>
+        <p>All artwork is unframed. {COLLECTION_NOTE}</p>
         <p>These pieces are copies, imitations, or studies of AI-modified, AI-generated, or inspired artwork. They are not originals by the referenced artists.</p>
       </footer>
     </>

@@ -25,7 +25,6 @@ export function winnerMessage(payload) {
       'Your donation is payment for the artwork. Please reply with your donation confirmation so I can match it to your winning bid.',
       '',
       payload.collection_note,
-      'Please wait for the confirmed collection details before travelling to the State Library.',
       '',
       `Questions? Reply to this email at ${SENDER_EMAIL}.`,
       '',

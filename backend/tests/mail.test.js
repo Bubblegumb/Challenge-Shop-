@@ -6,20 +6,20 @@ import { smtpFailureStatus, winnerMessage } from '../../supabase/functions/winne
 const payload = {
   title: 'Study No. 01', amount_cents: 1551, name: 'A bidder', email: 'bidder@example.com',
   donation_url: 'https://www.neddsuncomfortablechallenge.com/fundraisers/sujaljoshi/challenge-2026',
-  collection_note: 'Collection at the State Library during a one-hour window. Date and time to be confirmed.',
+  collection_note: 'Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).',
 }
 const secret = 'a'.repeat(64)
 const request = () => new Request('https://example.com/winner-mail', { method: 'POST', headers: { 'x-auction-secret': secret } })
 
-test('winner email includes exact amount, fundraising link, unframed warning, and unbooked collection instructions', () => {
+test('winner email includes exact amount, fundraising link, unframed warning, and confirmed collection details', () => {
   const message = winnerMessage(payload)
   assert.match(message.from, /sujaljoshi77@gmail.com/)
   assert.equal(message.to, 'bidder@example.com')
   assert.match(message.text, /exactly \$15\.51 AUD/)
   assert.ok(message.text.includes(payload.donation_url))
   assert.match(message.text, /YOUR ARTWORK IS UNFRAMED\. NO FRAME IS INCLUDED/)
-  assert.match(message.text, /State Library during a one-hour window/)
-  assert.match(message.text, /wait for the confirmed collection details/)
+  assert.ok(message.text.includes(payload.collection_note))
+  assert.doesNotMatch(message.text, /wait for the confirmed collection details|to be confirmed/)
 })
 
 test('an unauthorized invocation cannot finalize, read contacts, or send emails', async () => {

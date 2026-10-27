@@ -2,7 +2,7 @@
 
 Each artwork starts at AUD $10 and accepts bids up to AUD $75. The first
 accepted, verified $75 bid locks that artwork. Other artworks stay open until
-12 noon on 28 October 2026, Australia/Sydney (`2026-10-28T01:00:00Z`).
+11:59 pm on 28 October 2026, Australia/Sydney (`2026-10-28T12:59:00Z`).
 Requesting a code does not reserve an artwork. The database checks the current
 price, lock, and deadline when the verified bid arrives. Email verification
 proves access to a mailbox, not the bidder's identity or payment.
@@ -15,10 +15,20 @@ For an existing auction, pause bids in the Supabase SQL Editor before upgrading:
 	update auction_private.settings set accepting_bids = false where id;
 ```
 
-- For an existing database with migration `202610260001_auction.sql`, run only
-  [202610260002_verified_capped_bids.sql](migrations/202610260002_verified_capped_bids.sql).
+- For an existing database with migration `202610260001_auction.sql`, run
+  [202610260002_verified_capped_bids.sql](migrations/202610260002_verified_capped_bids.sql)
+  if it has not already been applied, then run
+  [202610280001_extend_auction_deadline.sql](migrations/202610280001_extend_auction_deadline.sql)
+  and [202610280002_confirm_collection_details.sql](migrations/202610280002_confirm_collection_details.sql).
+- If the verification upgrade is already applied, run the deadline and collection
+  migrations that have not yet been applied.
 - For a fresh database, run [202610260001_auction.sql](migrations/202610260001_auction.sql)
-  first, then run `202610260002_verified_capped_bids.sql`.
+  first, then run `202610260002_verified_capped_bids.sql`, followed by
+  `202610280001_extend_auction_deadline.sql` and `202610280002_confirm_collection_details.sql`.
+
+The deadline and collection migrations update the existing settings and their
+defaults. Deploy the updated frontend and `winner-mail` function to display the
+confirmed details on the website and in winner emails.
 
 Never rerun migration `001` after upgrading. It restores the old anonymous bid
 permission and old bid function. Use [artworks.sql](artworks.sql) for later
@@ -186,10 +196,13 @@ After changing gallery titles or photos, run `npm.cmd run sync:auction` in
 Run `npm.cmd run check:auction` to check that file against the gallery.
 Do not replay migrations to update listings.
 
-Before winner emails are prepared, update `auction_private.settings.collection_note`
-with the confirmed State Library date, meeting point, and one-hour collection
-window. Prepared email payloads retain their original instructions. Send a
-separate update if those details change after preparation.
+Collection is at the State Library on Friday 30 October 2026 from 1:00 pm to
+1:55 pm, Sydney time. Apply
+[202610280002_confirm_collection_details.sql](migrations/202610280002_confirm_collection_details.sql)
+to update `auction_private.settings.collection_note` and its default.
+
+Prepared email payloads retain their original instructions. Send a separate
+update if those details change after preparation.
 
 See [backend verification](../backend/README.md) for local checks and their limits.
 Official references: [email OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless),

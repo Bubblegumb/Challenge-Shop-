@@ -140,6 +140,13 @@ test('the exhibition title is a collection switch with an accessible destination
   assert.match(markup, /10 works/)
 })
 
+test('the gallery footer shows the confirmed State Library collection date and time', () => {
+  const markup = renderToStaticMarkup(createElement(App))
+  const footer = markup.match(/<footer>(.*?)<\/footer>/s)[1]
+  assert.ok(footer.includes('Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).'))
+  assert.doesNotMatch(footer, /one-hour window|booking details will be emailed/)
+})
+
 test('a one-work second collection has correct labels and disables both navigation buttons', () => {
   const second = artworkData.collections[1]
   const collection = { ...second, artworks: second.artworks.slice(0, 1) }
@@ -190,7 +197,7 @@ test('selected artwork information retains the description and six guide facts',
   assert.equal(facts.Condition, artwork.condition)
   assert.equal(facts['Starting price'], `${formatters.formatPrice(artwork.priceCents)} AUD`)
   assert.equal(facts.Framing, artwork.frame)
-    assert.match(facts.Collection, /Collection at the State Library during a one-hour window/)
+  assert.equal(facts.Collection, 'Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).')
   assert.ok(markup.includes(artwork.description))
   assert.match(markup, /\baria-labelledby="dialog-title"/)
   assert.match(markup, /\baria-describedby="dialog-description"/)
@@ -240,7 +247,7 @@ test('guest bidding collects only amount and contact details with clear payment 
   assert.match(markup, /Send verification code/)
   assert.match(markup, /first verified \$75 bid secures this artwork/)
   assert.match(markup, /Unframed artwork\. No frame is included/)
-  assert.match(markup, /State Library during a one-hour window/)
+  assert.ok(markup.includes('Collection at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).'))
   assert.match(markup, /donate your exact winning bid/)
   assert.doesNotMatch(markup, /name="password"|name="phone"/)
 })

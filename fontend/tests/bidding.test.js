@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { AUCTION_CLOSES_AT, BID_CAP_CENTS, biddingClosed, formatBid, parseBidCents } from '../src/utils/bidding.js'
+import { AUCTION_CLOSES_AT, AUCTION_DEADLINE_LABEL, BID_CAP_CENTS, biddingClosed, formatBid, parseBidCents } from '../src/utils/bidding.js'
 
 test('bid amounts preserve exact cents and reject invalid or sub-$10 input', () => {
   assert.equal(parseBidCents('10'), 1000)
@@ -15,10 +15,15 @@ test('bid amounts preserve exact cents and reject invalid or sub-$10 input', () 
   assert.equal(formatBid(1551), '$15.51')
 })
 
-test('bidding closes at noon Sydney and stays closed at the exact boundary', () => {
+test('bidding closes at 11:59 pm on 28 October Sydney time and stays closed at the exact boundary', () => {
   const cutoff = Date.parse(AUCTION_CLOSES_AT)
+  assert.equal(AUCTION_CLOSES_AT, '2026-10-28T12:59:00.000Z')
+  assert.equal(AUCTION_DEADLINE_LABEL, '28 October 2026 at 11:59 pm (Sydney time)')
+  assert.equal(biddingClosed(AUCTION_CLOSES_AT, Date.parse('2026-10-28T12:00:00+11:00')), false)
   assert.equal(biddingClosed(AUCTION_CLOSES_AT, cutoff - 1), false)
   assert.equal(biddingClosed(AUCTION_CLOSES_AT, cutoff), true)
   assert.equal(biddingClosed(AUCTION_CLOSES_AT, cutoff + 1), true)
-  assert.match(new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Sydney', hour: 'numeric', hour12: true }).format(cutoff), /12 pm/)
+  assert.equal(new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney', dateStyle: 'long', timeStyle: 'short',
+  }).format(cutoff), '28 October 2026 at 11:59 pm')
 })

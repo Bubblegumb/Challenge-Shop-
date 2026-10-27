@@ -183,7 +183,8 @@ const collectionDefinitions = [
       {
         id: 'second-study-9',
         image: '19.jpg',
-        title: 'Study No. 09',
+        title: 'New Beginings',
+        description: 'A new beginning is a new start, a second chance at something. And it’s something not everybody gets.',
         priceCents: 1000,
       },
       {

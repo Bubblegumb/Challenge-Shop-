@@ -18,7 +18,7 @@ test('winner email includes exact amount, fundraising link, unframed warning, an
   assert.match(message.text, /exactly \$15\.51 AUD/)
   assert.ok(message.text.includes(payload.donation_url))
   assert.match(message.text, /YOUR ARTWORK IS UNFRAMED\. NO FRAME IS INCLUDED/)
-  assert.ok(message.text.includes(payload.collection_note))
+  assert.ok(message.text.includes('Artwork handover will take place in Meeting Room 1 at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).'))
   assert.doesNotMatch(message.text, /wait for the confirmed collection details|to be confirmed/)
 })
 

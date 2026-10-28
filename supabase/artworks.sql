@@ -20,6 +20,7 @@ insert into auction_private.artworks(id, title, starting_price_cents) values
   ('second-study-6', 'A Hand', 1000),
   ('second-study-7', 'The First Night', 1000),
   ('second-study-8', 'The First Breakfast', 1000),
-  ('second-study-9', 'New Beginings', 1000)
+  ('second-study-9', 'New Beginings', 1000),
+  ('second-study-10', 'Home sweet Home', 1000)
 on conflict (id) do update set title = excluded.title;
 commit;

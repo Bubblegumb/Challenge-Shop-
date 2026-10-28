@@ -190,7 +190,8 @@ const collectionDefinitions = [
       {
         id: 'second-study-10',
         image: '20.jpg',
-        title: 'Study No. 10',
+        title: 'Home sweet Home',
+        description: 'The one place that stays the same when everything else doesn’t.',
         priceCents: 1000,
       },
     ],

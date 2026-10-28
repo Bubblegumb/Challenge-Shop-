@@ -24,7 +24,7 @@ export function winnerMessage(payload) {
       '',
       'Your donation is payment for the artwork. Please reply with your donation confirmation so I can match it to your winning bid.',
       '',
-      payload.collection_note,
+      'Artwork handover will take place in Meeting Room 1 at the State Library on Friday 30 October 2026 from 1:00 pm to 1:55 pm (Sydney time).',
       '',
       `Questions? Reply to this email at ${SENDER_EMAIL}.`,
       '',
